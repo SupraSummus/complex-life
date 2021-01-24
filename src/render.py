@@ -6,11 +6,11 @@ from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-from fcc import sphere, zero, neighbour_diffs, faces
+from fcc import sphere, zero, neighbour_diffs, Vector
 from world import World, RandomGenerator, MemoryStorage, Cell
 
 
-def draw_cell(coords, cell):
+def draw_cell(coords, cell, quadric):
     glPushMatrix()
     glTranslatef(*coords.cartesian)
 
@@ -25,14 +25,9 @@ def draw_cell(coords, cell):
         glVertex3fv(end)
     glEnd()
 
-    glBegin(GL_QUADS)
-    glColor4f(cell.color.r, cell.color.g, cell.color.b, cell.color.a)
-    for face in faces:
-        for vertex in face:
-            glVertex3fv(tuple(
-                x/5 for x in vertex.cartesian
-            ))
-    glEnd()
+    if cell.color.a:
+        glColor4f(cell.color.r, cell.color.g, cell.color.b, cell.color.a)
+        gluSphere(quadric, 0.5, 16, 16)
 
     glPopMatrix()
 
@@ -67,6 +62,16 @@ def main():
     display = (800,600)
     pygame.display.set_mode(display, DOUBLEBUF|OPENGL)
     glEnable(GL_DEPTH_TEST)
+    glEnable(GL_LIGHTING)
+    glEnable(GL_COLOR_MATERIAL)
+    glLightfv(GL_LIGHT0, GL_AMBIENT, (0.1, 0.1, 0.1, 1.0))		# Setup The Ambient Light
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, (0.1, 0.1, 0.1, 1.0))		# Setup The Diffuse Light
+    glLightfv(GL_LIGHT0, GL_POSITION, (0.0, 10.0, 0.0, 1.0))	# Position The Light
+    glEnable(GL_LIGHT0)					# Enable Light One
+
+    quadric = gluNewQuadric()
+    #gluQuadricDrawStyle(quadric, GLU_LINE)
+
     gluPerspective(60, (display[0]/display[1]), 0.1, 50.0)
 
     glTranslatef(0.0, 0, -5)
@@ -78,11 +83,11 @@ def main():
                 pygame.quit()
                 quit()
 
-        glRotatef(1, 0, 1, 0)
+        glRotatef(0.1, 0, 1, 0)
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
         for c in sphere(3):
-            draw_cell(c, world.get_cell(c))
+            draw_cell(c, world.get_cell(c), quadric)
 
         for diff in neighbour_diffs:
             draw_connection(zero, diff)

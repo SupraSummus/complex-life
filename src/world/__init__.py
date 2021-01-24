@@ -19,7 +19,7 @@ class RandomGenerator:
     def generate(self, world, point):
         return [(
             point,
-            Cell(Color(random(), random(), random(), 0)),
+            Cell(Color(random(), random(), random(), round(random()))),
         )]
 
 

@@ -12,10 +12,18 @@ class Vector:
     q: int
     v: int
     w: int
-    x: int
-    y: int
-    z: int
-    a: int
+
+    @property
+    def x(self):
+        return -self.q - self.v
+
+    @property
+    def y(self):
+        return -self.v - self.w
+
+    @property
+    def z(self):
+        return -self.w - self.q
 
     @property
     def cartesian(self):
@@ -27,16 +35,39 @@ class Vector:
 
     def add(self, other):
         return Vector(
-            q=self.q + other.q,
-            v=self.v + other.v,
-            w=self.w + other.w,
-            x=self.x + other.x,
-            y=self.y + other.y,
-            z=self.z + other.z,
-            a=self.a + other.a,
+            self.q + other.q,
+            self.v + other.v,
+            self.w + other.w,
         )
 
-zero = Vector(0, 0, 0, 0, 0, 0, 0)
+    def substract(self, other):
+        return Vector(
+            self.q - other.q,
+            self.v - other.v,
+            self.w - other.w,
+        )
+
+    def distance(self, other):
+        delta = self.substract(other)
+        return max(map(abs, (
+            delta.q,
+            delta.v,
+            delta.w,
+            delta.q + delta.v,
+            delta.q + delta.w,
+            delta.v + delta.w,
+            delta.q + delta.v + delta.w,
+        )))
+
+    def product(self, other):
+        return Vector(
+            self.v * other.w - self.w * other.v,
+            self.w * other.q - self.q * other.w,
+            self.q * other.v - self.v * other.q,
+        )
+
+
+zero = Vector(0, 0, 0)
 
 
 def sphere(radius: int) -> list[Vector]:
@@ -45,27 +76,11 @@ def sphere(radius: int) -> list[Vector]:
         range(-radius + 1, radius),
         range(-radius + 1, radius),
     ):
-        derrived_coords = (-q - v, -v - w, -w - q, -q - v - w)
-        if all(
-            x > -radius and x < radius
-            for x in derrived_coords
-        ):
-            yield Vector(q, v, w, *derrived_coords)
+        vector = Vector(q, v, w)
+        d = vector.distance(zero)
+        if d > -radius and d < radius:
+            yield vector
 
 
 neighbour_diffs = tuple(sorted(set(sphere(2)) - set(sphere(1))))
 assert len(neighbour_diffs) == 12
-
-
-faces = []
-for neighbour in neighbour_diffs:
-    face = []
-    for neighbours_neighbour in neighbour_diffs:
-        neighbours_neighbour = neighbours_neighbour.add(neighbour)
-        if neighbours_neighbour in neighbour_diffs:
-            face.append(neighbours_neighbour)
-    face = sorted(face)
-    print(face)
-    assert len(face) == 4
-    faces.append(face)
-assert len(faces) == 12
