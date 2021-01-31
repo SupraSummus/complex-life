@@ -20,7 +20,6 @@ class Shader:
         )
         cell = self.world.get_cell(coord)
         return cell.color.a
-        # return 0 if cell.color.a < 0.5 else 0.999
 
 
 if __name__ == '__main__':
@@ -28,7 +27,8 @@ if __name__ == '__main__':
 
     shader = Shader(
         world=default_world,
-        scale=10,
+        scale=5,
+        y=0,
     )
 
     size = width, height = (800, 600)
@@ -36,7 +36,14 @@ if __name__ == '__main__':
     screen.fill((255, 0, 0))
     for x, y in product(range(width), range(height)):
         v = int(shader(x, y) * 256)
-        screen.set_at((x, y), (v, v, v))
+        if v < 0:
+            screen.set_at((x, y), (0, 0, 255))
+            assert False
+        elif v > 255:
+            screen.set_at((x, y), (255, 0, 0))
+            assert False
+        else:
+            screen.set_at((x, y), (v, v, v))
     pygame.display.flip()
 
     pygame.event.set_allowed(None)  # allow all

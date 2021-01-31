@@ -1,5 +1,7 @@
-from hashlib import sha256
+from dataclasses import dataclass
 from functools import lru_cache
+from hashlib import sha256
+import struct
 
 
 class Extractor:
@@ -26,6 +28,17 @@ class Extractor:
             yield from self.input_to_bytes(i)
 
     def input_to_bytes(self, i):
+        if isinstance(i, bool):
+            if i:
+                yield b'\x01'
+            else:
+                yield b'\x00'
+            return
+
+        if isinstance(i, float):
+            yield struct.pack('<f', i)
+            return
+
         if i < 0:
             yield b'\x00'
             i = -i
@@ -34,12 +47,12 @@ class Extractor:
         yield i.to_bytes(self.WORD_BYTES, self.BYTE_ORDER)
 
 
+@dataclass(frozen=True)
 class SHA256Extractor(Extractor):
     """SHA2 functions are (afaik) not proved to be randomness extractors,
     but they are propably fine for our aplications."""
 
-    def __init__(self, seed):
-        self.seed = seed
+    seed: bytes
 
     @lru_cache(maxsize=1024)
     def bytes(self, byte_count, *inputs):

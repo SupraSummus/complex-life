@@ -12,9 +12,10 @@ from world import default_world
 
 def draw_cell(coords, cell, quadric):
     glPushMatrix()
-    glTranslatef(*coords.cartesian)
+    xyz = coords.cartesian
+    glTranslatef(*xyz)
 
-    if cell.color.a >= 0.5:
+    if cell.color.a > 0.6:
         glColor4f(cell.color.r, cell.color.g, cell.color.b, cell.color.a)
         gluSphere(quadric, 0.5, 16, 16)
 
@@ -65,7 +66,7 @@ def main():
                 pygame.quit()
                 quit()
 
-        glRotatef(0.1, 0, 1, 0)
+        glRotatef(1, 0, 1, 0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         for c in sphere(8):

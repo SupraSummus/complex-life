@@ -40,25 +40,29 @@ class Vector:
         q = round(x / CELL_DEPTH - w/2 - v/2)
         return cls(round(q), round(v), round(w))
 
-    def add(self, other):
-        return Vector(
-            self.q + other.q,
-            self.v + other.v,
-            self.w + other.w,
-        )
+    def __add__(self, other):
+        if isinstance(other, Vector):
+            return self.bimap((lambda a, b: a + b), other)
+        else:
+            raise ValueError()
 
-    def substract(self, other):
-        return Vector(
-            self.q - other.q,
-            self.v - other.v,
-            self.w - other.w,
-        )
+    def __sub__(self, other):
+        if isinstance(other, Vector):
+            return self.bimap((lambda a, b: a - b), other)
+        else:
+            raise ValueError()
+
+    def __mul__(self, other):
+        return self.map(lambda a: a * other)
 
     def __truediv__(self, other):
         return self.map(lambda a: a / other)
 
     def __floordiv__(self, other):
         return self.map(lambda a: a // other)
+
+    def __mod__(self, other):
+        return self.map(lambda a: a % other)
 
     def map(self, f):
         return Vector(
@@ -67,20 +71,35 @@ class Vector:
             f(self.w),
         )
 
+    def bimap(self, f, other):
+        return Vector(
+            f(self.q, other.q),
+            f(self.v, other.v),
+            f(self.w, other.w),
+        )
+
     def distance(self, other):
-        delta = self.substract(other)
+        delta = self - other
         return max(map(abs, (
             delta.q,
             delta.v,
             delta.w,
-            delta.q + delta.v,
-            delta.q + delta.w,
-            delta.v + delta.w,
+            delta.x,
+            delta.y,
+            delta.z,
             delta.q + delta.v + delta.w,
         )))
 
+    def as_tuple(self):
+        return (self.q, self.v, self.w)
 
-zero = Vector(0, 0, 0)
+    @classmethod
+    @property
+    def zero(cls):
+        return cls(0, 0, 0)
+
+
+zero = Vector.zero
 
 
 def sphere(radius: int) -> list[Vector]:
