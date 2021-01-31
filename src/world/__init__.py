@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from random import random
+
+from extractor import SHA256Extractor
 
 
 class MemoryStorage(dict):
@@ -16,11 +17,25 @@ class ConstantGenerator:
 
 
 class RandomGenerator:
+    def __init__(self, extractor):
+        self.extractor = extractor
+
     def generate(self, world, point):
+        fill = self.extractor.float(point.q, point.v, point.w)
         return [(
             point,
-            Cell(Color(random(), random(), random(), round(random()))),
+            Cell(Color(1.0, 1.0, 1.0, fill)),
         )]
+
+
+class FractalNoiseGenerator:
+    def __init__(self, levels, extractor):
+        self.levels = levels
+        self.extractor = extractor
+
+    def generate(self, world, point):
+        for d in range(self.levels):
+            pass
 
 
 class World:
@@ -53,3 +68,11 @@ class Color:
 @dataclass(frozen=True)
 class Cell:
     color: Color
+
+
+default_world = World(
+    storage=MemoryStorage(),
+    generator=RandomGenerator(
+        extractor=SHA256Extractor(b'pineapple seed'),
+    ),
+)

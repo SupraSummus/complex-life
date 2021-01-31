@@ -33,6 +33,13 @@ class Vector:
             (self.w + self.v/3) * CELL_WIDTH,
         )
 
+    @classmethod
+    def from_cartesian(cls, x, y, z):
+        v = round(y / CELL_HEIGHT)
+        w = round(z / CELL_WIDTH - v/3)
+        q = round(x / CELL_DEPTH - w/2 - v/2)
+        return cls(round(q), round(v), round(w))
+
     def add(self, other):
         return Vector(
             self.q + other.q,
@@ -47,6 +54,19 @@ class Vector:
             self.w - other.w,
         )
 
+    def __truediv__(self, other):
+        return self.map(lambda a: a / other)
+
+    def __floordiv__(self, other):
+        return self.map(lambda a: a // other)
+
+    def map(self, f):
+        return Vector(
+            f(self.q),
+            f(self.v),
+            f(self.w),
+        )
+
     def distance(self, other):
         delta = self.substract(other)
         return max(map(abs, (
@@ -58,13 +78,6 @@ class Vector:
             delta.v + delta.w,
             delta.q + delta.v + delta.w,
         )))
-
-    def product(self, other):
-        return Vector(
-            self.v * other.w - self.w * other.v,
-            self.w * other.q - self.q * other.w,
-            self.q * other.v - self.v * other.q,
-        )
 
 
 zero = Vector(0, 0, 0)
