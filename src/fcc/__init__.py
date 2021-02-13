@@ -28,17 +28,17 @@ class Vector:
     @property
     def cartesian(self):
         return (
-            (self.q + self.w/2 + self.v/2) * CELL_DEPTH,
+            (self.q + self.w / 2 + self.v / 2) * CELL_DEPTH,
             self.v * CELL_HEIGHT,
-            (self.w + self.v/3) * CELL_WIDTH,
+            (self.w + self.v / 3) * CELL_WIDTH,
         )
 
     @classmethod
     def from_cartesian(cls, x, y, z):
         v = round(y / CELL_HEIGHT)
-        w = round(z / CELL_WIDTH - v/3)
-        q = round(x / CELL_DEPTH - w/2 - v/2)
-        return cls(round(q), round(v), round(w))
+        w = round(z / CELL_WIDTH - v / 3)
+        q = round(x / CELL_DEPTH - w / 2 - v / 2)
+        return cls(q, v, w)
 
     def __add__(self, other):
         if isinstance(other, Vector):
@@ -90,6 +90,19 @@ class Vector:
             delta.q + delta.v + delta.w,
         )))
 
+        """
+    def dot(self, other):
+        return sum((
+            self.q * other.q,
+            self.v * other.v,
+            self.w * other.w,
+
+        ))
+        return sum(self.bimap(
+            (lambda a, b: a * b),
+            other,
+        )) / 2"""
+
     def as_tuple(self):
         return (self.q, self.v, self.w)
 
@@ -102,17 +115,23 @@ class Vector:
 zero = Vector.zero
 
 
-def sphere(radius: int) -> list[Vector]:
+def ball(radius: int):
     for q, v, w in product(
-        range(-radius + 1, radius),
-        range(-radius + 1, radius),
-        range(-radius + 1, radius),
+        range(-radius, radius + 1),
+        range(-radius, radius + 1),
+        range(-radius, radius + 1),
     ):
         vector = Vector(q, v, w)
         d = vector.distance(zero)
-        if d > -radius and d < radius:
+        if d <= radius:
             yield vector
 
 
-neighbour_diffs = tuple(sorted(set(sphere(2)) - set(sphere(1))))
+def sphere(radius):
+    return tuple(sorted(
+        set(ball(radius)) - set(ball(radius - 1))
+    ))
+
+
+neighbour_diffs = sphere(1)
 assert len(neighbour_diffs) == 12

@@ -6,7 +6,7 @@ from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-from fcc import sphere, zero, neighbour_diffs
+from fcc import sphere, zero, neighbour_diffs, ball
 from world import default_world
 
 
@@ -15,9 +15,8 @@ def draw_cell(coords, cell, quadric):
     xyz = coords.cartesian
     glTranslatef(*xyz)
 
-    if cell.color.a > 0.6:
-        glColor4f(cell.color.r, cell.color.g, cell.color.b, cell.color.a)
-        gluSphere(quadric, 0.5, 16, 16)
+    #if cell.transparency == 0:
+    gluSphere(quadric, 0.5, 16, 16)
 
     glPopMatrix()
 
@@ -57,7 +56,7 @@ def main():
 
     gluPerspective(60, (display[0]/display[1]), 0.1, 50.0)
 
-    glTranslatef(0.0, 0, -15)
+    #glTranslatef(0.0, 0, -15)
     glRotatef(15, 1, 0, 0)
 
     while True:
@@ -69,7 +68,11 @@ def main():
         glRotatef(1, 0, 1, 0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-        for c in sphere(8):
+        #for i in range(15):
+        #    print(i, len(sphere(i)))
+        #3/0
+
+        for c in sphere(12):
             draw_cell(c, default_world.get_cell(c), quadric)
 
         for diff in neighbour_diffs:

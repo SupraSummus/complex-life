@@ -19,7 +19,7 @@ class Shader:
             y / self.scale,
         )
         cell = self.world.get_cell(coord)
-        return cell.color.a
+        return cell.transparency * 255
 
 
 if __name__ == '__main__':
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(size)
     screen.fill((255, 0, 0))
     for x, y in product(range(width), range(height)):
-        v = int(shader(x, y) * 256)
+        v = shader(x, y)
         if v < 0:
             screen.set_at((x, y), (0, 0, 255))
             assert False

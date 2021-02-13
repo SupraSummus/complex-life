@@ -23,11 +23,11 @@ class RandomGenerator:
         self.extractor = extractor
 
     def __call__(self, world, point):
-        fill = self.extractor.float(*point.as_tuple())
-        return [(
-            point,
-            Cell(Color(1.0, 1.0, 1.0, fill)),
-        )]
+        cell = self.extractor.choice(
+            [Cell.air, Cell.ground],
+            *point.as_tuple(),
+        )
+        return [(point, cell)]
 
 
 @dataclass(frozen=True)
@@ -63,7 +63,7 @@ class FractalNoiseGenerator:
         v, max_v = map(sum, zip(*components))
         yield (
             point,
-            Cell(Color(1.0, 1.0, 1.0, v / max_v)),
+            Cell.air if v / max_v < 0.5 else Cell.ground,
         )
 
     @lru_cache(maxsize=1024)
@@ -108,16 +108,12 @@ class World:
 
 
 @dataclass(frozen=True)
-class Color:
-    r: float
-    g: float
-    b: float
-    a: float
-
-
-@dataclass(frozen=True)
 class Cell:
-    color: Color
+    transparency: int
+
+
+Cell.air = Cell(transparency=1)
+Cell.ground = Cell(transparency=0)
 
 
 default_world = World(
