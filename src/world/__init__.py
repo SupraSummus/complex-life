@@ -109,11 +109,20 @@ class World:
 
 @dataclass(frozen=True)
 class Cell:
-    transparency: int
+    transmittance: int = 0  # 0-7
+    reflectance: int = 0  # 0-7
+    luminance: int = 0  # 0-7
 
 
-Cell.air = Cell(transparency=1)
-Cell.ground = Cell(transparency=0)
+Cell.air = Cell(
+    transmittance=7,
+)
+Cell.ground = Cell(
+    reflectance=1,
+)
+Cell.light_source = Cell(
+    luminance=7,
+)
 
 
 default_world = World(

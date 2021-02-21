@@ -79,40 +79,39 @@ class Vector:
         )
 
     def distance(self, other):
-        delta = self - other
+        return (self - other).length
+
+    @property
+    def length(self):
         return max(map(abs, (
-            delta.q,
-            delta.v,
-            delta.w,
-            delta.x,
-            delta.y,
-            delta.z,
-            delta.q + delta.v + delta.w,
+            self.q,
+            self.v,
+            self.w,
+            self.x,
+            self.y,
+            self.z,
+            self.q + self.v + self.w,
         )))
 
-        """
     def dot(self, other):
         return sum((
             self.q * other.q,
             self.v * other.v,
             self.w * other.w,
-
-        ))
-        return sum(self.bimap(
-            (lambda a, b: a * b),
-            other,
-        )) / 2"""
+            self.x * other.x,
+            self.y * other.y,
+            self.z * other.z,
+        )) / 3
 
     def as_tuple(self):
         return (self.q, self.v, self.w)
 
-    @classmethod
     @property
-    def zero(cls):
-        return cls(0, 0, 0)
+    def full_tuple(self):
+        return (self.q, self.v, self.w, self.x, self.y, self.z)
 
 
-zero = Vector.zero
+Vector.zero = Vector(0, 0, 0)
 
 
 def ball(radius: int):
@@ -122,7 +121,7 @@ def ball(radius: int):
         range(-radius, radius + 1),
     ):
         vector = Vector(q, v, w)
-        d = vector.distance(zero)
+        d = vector.distance(Vector.zero)
         if d <= radius:
             yield vector
 
@@ -134,4 +133,3 @@ def sphere(radius):
 
 
 neighbour_diffs = sphere(1)
-assert len(neighbour_diffs) == 12

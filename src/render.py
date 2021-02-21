@@ -6,7 +6,7 @@ from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-from fcc import sphere, zero, neighbour_diffs, ball
+from fcc import sphere, neighbour_diffs, ball, Vector
 from world import default_world
 
 
@@ -76,7 +76,7 @@ def main():
             draw_cell(c, default_world.get_cell(c), quadric)
 
         for diff in neighbour_diffs:
-            draw_connection(zero, diff)
+            draw_connection(Vector.zero, diff)
 
         pygame.display.flip()
         pygame.time.wait(1000//60)
