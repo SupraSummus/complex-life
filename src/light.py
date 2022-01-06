@@ -12,17 +12,20 @@ max_reflectance = 7
 max_luminance = 7
 
 
-@dataclass(frozen=True)
 class LightDirection:
-    direction: Vector
+    local_dependencies = ('reflectance', 'transmittance')
 
-    def dependencies(self, cell):
+    def __init__(self, direction):
+        self.direction = direction
+
+    def dependencies(self, local_dependencies):
+        reflectance, transmittance = local_dependencies
         deps = []
-        deps += self._incoming(self.direction, cell.reflectance * max_light_level, max_reflectance)
-        deps += self._incoming(-self.direction, cell.transmittance * max_light_level, max_transmittance)
+        deps += self._nonzero_products(self.direction, reflectance * max_light_level, max_reflectance)
+        deps += self._nonzero_products(-self.direction, transmittance * max_light_level, max_transmittance)
         return deps
 
-    def update(cell):
+    def update(self, local_dependencies, dependencies):
         return cell
 
     def _nonzero_products(self, direction, max_value, div_value):

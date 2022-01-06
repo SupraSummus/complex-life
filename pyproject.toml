@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Jan Rydzewski <flegmer@gmail.com>"]
 packages = [
-    {include = "extractor", from = "src"},
+    {include = "extractor.py", from = "src"},
     {include = "fcc", from = "src"},
 ]
 

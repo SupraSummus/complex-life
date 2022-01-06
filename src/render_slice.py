@@ -19,7 +19,7 @@ class Shader:
             y / self.scale,
         )
         cell = self.world.get_cell(coord)
-        return cell.transparency * 255
+        return cell.transmittance / 7 * 255
 
 
 if __name__ == '__main__':

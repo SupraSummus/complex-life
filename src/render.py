@@ -15,8 +15,8 @@ def draw_cell(coords, cell, quadric):
     xyz = coords.cartesian
     glTranslatef(*xyz)
 
-    #if cell.transparency == 0:
-    gluSphere(quadric, 0.5, 16, 16)
+    if cell.transmittance > 0:
+        gluSphere(quadric, 0.5, 16, 16)
 
     glPopMatrix()
 
@@ -56,7 +56,7 @@ def main():
 
     gluPerspective(60, (display[0]/display[1]), 0.1, 50.0)
 
-    #glTranslatef(0.0, 0, -15)
+    glTranslatef(0.0, 0, -15)
     glRotatef(15, 1, 0, 0)
 
     while True:
@@ -72,7 +72,7 @@ def main():
         #    print(i, len(sphere(i)))
         #3/0
 
-        for c in sphere(12):
+        for c in ball(6):
             draw_cell(c, default_world.get_cell(c), quadric)
 
         for diff in neighbour_diffs:
