@@ -16,7 +16,7 @@ def extractor(request):
 
 
 @pytest.fixture(params=[
-    0, 1, 10, 100,
+    0, 1, 10, -100,
 ])
 def offset(request):
     return request.param
@@ -29,17 +29,17 @@ def count(request):
     return request.param
 
 
-def test_hash_extractor_getitem_count(extractor, offset, count):
+def test_extractor_getitem_count(extractor, offset, count):
     assert len(extractor[offset:offset + count]) == count
 
 
-def test_hash_extractor_getitem_is_associative(extractor, offset, count):
+def test_extractor_getitem_is_associative(extractor, offset, count):
     assert extractor[offset:offset + count] == \
         extractor[offset:offset + count // 2] + \
         extractor[offset + count // 2:offset + count]
 
 
-def test_hash_extractor_getitem_single(extractor, offset):
+def test_extractor_getitem_single(extractor, offset):
     if extractor.item_type == bytes:
         assert extractor[offset] == extractor[offset:offset + 1][:1]
     else:
