@@ -9,10 +9,10 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.10"
 pygame = "^2.0.1"
 pyopengl = "^3.1.5"
-pyopengl_accelerate = "^3.1.5"
+#pyopengl_accelerate = "^3.1.5"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.8.4"
