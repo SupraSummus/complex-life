@@ -1,4 +1,4 @@
-from octree import location_to_sequential
+from octree import z_order
 import pytest
 
 
@@ -11,13 +11,27 @@ def qube(x, y, z, size):
     return points
 
 
+@pytest.mark.parametrize(('location', 'sequential'), [
+    ((0, 0, 0), 0),
+    ((1, 0, 0), 1),
+    ((1, 1, 1), 7),
+
+    ((2, 0, 0), 8),
+    ((3, 0, 0), 9),
+    ((3, 1, 1), 15),
+])
+def test_examples(location, sequential):
+    assert z_order.order(location) == sequential
+    assert tuple(z_order.point(sequential)) == location
+
+
 @pytest.mark.parametrize(('offset', 'size'), [
     ((0, 0, 0), 1),
     ((0, 0, 0), 16),
     ((16, 256, 32), 16),
 ])
-def test_location_to_sequential_is_continous(offset, size):
+def test_order_is_continous(offset, size):
     points = qube(*offset, size)
-    seqs = set(location_to_sequential(x, y, z) for x, y, z in points)
+    seqs = set(z_order.order(p) for p in points)
     assert len(seqs) == size ** 3
     assert max(seqs) - min(seqs) == size ** 3 - 1

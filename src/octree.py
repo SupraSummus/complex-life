@@ -1,18 +1,33 @@
-def location_to_sequential(x, y, z):
-    seq = 0
-    i = 0
-    while True:
-        m = 2 ** (i * 3)
-        seq += (x % 2) * m
-        seq += (y % 2) * m * 2
-        seq += (z % 2) * m * 4
-        x //= 2
-        y //= 2
-        z //= 2
-        i += 1
-        if x == 0 and y == 0 and z == 0:
-            break
-    return seq
+
+class ZOrder:
+    def __init__(self, dim):
+        self.dim = dim
+
+    def order(self, point) -> int:
+        order = 0
+        for i in range(self.dim):
+            assert point[i] >= 0
+            shift = i
+            v = point[i]
+            while v != 0:
+                order |= (v & 1) << shift
+                v >>= 1
+                shift += self.dim
+        return order
+
+    def point(self, order: int):
+        assert order >= 0
+        point = [0] * self.dim
+        shift = 0
+        while order != 0:
+            for i in range(self.dim):
+                point[i] |= (order & 1) << shift
+                order >>= 1
+            shift += 1
+        return point
+
+
+z_order = ZOrder(3)
 
 
 class Octree:
