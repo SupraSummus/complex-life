@@ -1,9 +1,10 @@
-from itertools import product
-import pygame
 from dataclasses import dataclass
+from itertools import product
+
+import pygame
 
 from fcc import Vector
-from world import default_world, World
+from world import World, default_world
 
 
 @dataclass

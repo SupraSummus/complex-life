@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from itertools import product
 
-
 CELL_DEPTH = 1.0
 CELL_HEIGHT = (6.0**0.5) / 3.0
 CELL_WIDTH = (3.0**0.5) / 2.0

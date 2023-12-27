@@ -1,12 +1,11 @@
 from pprint import pprint
 
 import pygame
-from pygame.locals import *
-
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from pygame.locals import *
 
-from fcc import sphere, neighbour_diffs, ball, Vector
+from fcc import Vector, ball, neighbour_diffs, sphere
 from world import default_world
 
 

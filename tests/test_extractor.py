@@ -1,5 +1,6 @@
-from extractor import HashExtractor, FloatExtractor
 import pytest
+
+from extractor import FloatExtractor, HashExtractor
 
 
 @pytest.fixture(params=[

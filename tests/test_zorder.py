@@ -1,5 +1,6 @@
-from octree import z_order
 import pytest
+
+from octree import z_order
 
 
 def qube(x, y, z, size):

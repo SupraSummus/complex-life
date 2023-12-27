@@ -1,5 +1,6 @@
-from extractor import HashExtractor
 import pytest
+
+from extractor import HashExtractor
 
 
 @pytest.mark.parametrize('count', [

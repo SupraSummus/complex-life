@@ -1,5 +1,6 @@
-import fcc
 import pytest
+
+import fcc
 
 
 def test_there_are_12_neighbours():

@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 
-from fcc import Vector, sphere, neighbour_diffs
-
+from fcc import Vector, neighbour_diffs, sphere
 
 resloution = 4
 directions = sphere(resolution)
