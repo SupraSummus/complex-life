@@ -94,6 +94,7 @@ block_colors = {
     'oak_planks': {'h': 35, 's': 93, 'l': 30},
     'oak_pressure_plate': {'h': 35, 's': 93, 'l': 30},
     'oak_stairs': {'h': 114, 's': 64, 'l': 22},
+    'packed_ice': {'h': 240, 's': 10, 'l': 95},
     'peony': {'h': 0, 's': 0, 'l': 100},
     'pink_tulip': {'h': 0, 's': 0, 'l': 0},
     'poppy': {'h': 0, 's': 100, 'l': 50},
@@ -115,6 +116,7 @@ block_colors = {
     'tall_seagrass': {'h': 94, 's': 42, 'l': 25},
     'torch': {'h': 60, 's': 100, 'l': 50},
     'snow': {'h': 240, 's': 10, 'l': 85},
+    'snow_block': {'h': 240, 's': 10, 'l': 95},
     'spawner': {'h': 180, 's': 100, 'l': 50},
     'vine': {'h': 114, 's': 64, 'l': 18},
     'wall_torch': {'h': 60, 's': 100, 'l': 50},
@@ -128,6 +130,9 @@ block_colors = {
 }
 
 
+unknown_colors = {}
+
+
 def get_map(chunk):
     # Show an image of the chunk from above
     pixels = b''
@@ -136,7 +141,6 @@ def get_map(chunk):
         for x in range(16):
             # Find the highest block in this column
             max_height = chunk.get_max_height()
-            tints = []
             for y in range(max_height, -1, -1):
                 block_id = chunk.get_block(x, y, z)
                 if block_id is not None and block_id not in block_ignore:
@@ -147,28 +151,13 @@ def get_map(chunk):
                     color = block_colors[block_id]
                 else:
                     color = {'h': 0, 's': 0, 'l': 100}
-                    print('warning: unknown color for block id: %s' % block_id)
-                    print('hint: add that block to the block_colors map')
+                    if block_id not in unknown_colors:
+                        unknown_colors[block_id] = 0
+                    unknown_colors[block_id] += 1
             else:
                 color = {'h': 0, 's': 0, 'l': 0}
 
-            height_shift = 0
-
-            final_color = {
-                'h': color['h'],
-                's': color['s'],
-                'l': color['l'] + height_shift,
-            }
-            if final_color['l'] > 100:
-                final_color['l'] = 100
-            if final_color['l'] < 0:
-                final_color['l'] = 0
-
-            # Apply tints from translucent blocks
-            for tint in reversed(tints):
-                final_color = hsl_slide(final_color, tint, 0.4)
-
-            rgb = hsl2rgb(final_color['h'], final_color['s'], final_color['l'])
+            rgb = hsl2rgb(color['h'], color['s'], color['l'])
 
             pixels += pack('BBB', rgb[0], rgb[1], rgb[2])
 
@@ -176,34 +165,12 @@ def get_map(chunk):
     return im
 
 
-# Color functions for map generation ##
-
-
-# Hue given in degrees,
-# saturation and lightness given either in range 0-1 or 0-100 and returned in kind
-def hsl_slide(hsl1, hsl2, ratio):
-    if abs(hsl2['h'] - hsl1['h']) > 180:
-        if hsl1['h'] > hsl2['h']:
-            hsl1['h'] -= 360
-        else:
-            hsl1['h'] += 360
-
-    # Find location of two colors on the H/S color circle
-    p1x = math.cos(math.radians(hsl1['h'])) * hsl1['s']
-    p1y = math.sin(math.radians(hsl1['h'])) * hsl1['s']
-    p2x = math.cos(math.radians(hsl2['h'])) * hsl2['s']
-    p2y = math.sin(math.radians(hsl2['h'])) * hsl2['s']
-
-    # Slide part of the way from tint to base color
-    avg_x = p1x + ratio * (p2x - p1x)
-    avg_y = p1y + ratio * (p2y - p1y)
-    avg_h = math.atan(avg_y / avg_x)
-    avg_s = avg_y / math.sin(avg_h)
-    avg_l = hsl1['l'] + ratio * (hsl2['l'] - hsl1['l'])
-    avg_h = math.degrees(avg_h)
-
-    # print('tint: %s base: %s avg: %s %s %s' % (tint,final_color,avg_h,avg_s,avg_l))
-    return {'h': avg_h, 's': avg_s, 'l': avg_l}
+def report_unknown_colors():
+    if unknown_colors:
+        print("Unknown block colors:")
+        for block_id, count in unknown_colors.items():
+            print(f"{block_id}: {count}")
+    unknown_colors.clear()
 
 
 # From http://www.easyrgb.com/index.php?X=MATH&H=19#text19
@@ -250,6 +217,7 @@ def main(world_folder):
                 sys.stdout.flush()
             elif i % 50 == 49:
                 sys.stdout.write('%5.1f%%\n' % (100 * i / t))
+                report_unknown_colors()
             i += 1
             chunkmap = get_map(chunk)
             x, z = chunk.get_coords()
